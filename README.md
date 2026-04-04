@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Laureano Racing — MVP de gestión
 
-## Getting Started
+Web app para **venta de repuestos/accesorios** y **taller de motos**: dashboard, productos, ventas, órdenes de trabajo, clientes, proveedores, encargos, caja, reportes y configuración (incluye pantalla preparada para facturación ARCA).
 
-First, run the development server:
+## Requisitos
+
+- Node.js 18+
+- npm
+
+## Puesta en marcha
 
 ```bash
+npm install
+npx prisma migrate dev
+npx prisma db seed
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrí [http://localhost:3000](http://localhost:3000). La pantalla de login usa:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Email:** `admin@laureanoracing.com`
+- **Contraseña:** `admin123`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Variables de entorno
 
-## Learn More
+Copiá `.env` (ya incluido en el repo para el MVP local) o creá uno con:
 
-To learn more about Next.js, take a look at the following resources:
+- `DATABASE_URL="file:./dev.db"`
+- `NEXTAUTH_SECRET` — cadena secreta para firmar sesiones
+- `NEXTAUTH_URL` — URL base (ej. `http://localhost:3000`)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Next.js 14 (App Router), TypeScript, Prisma + SQLite, Tailwind, componentes estilo shadcn, NextAuth (credenciales), React Hook Form + Zod, Zustand, Sonner, TanStack Table, Recharts, `@react-pdf/renderer`, date-fns (es).
 
-## Deploy on Vercel
+## Logo
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+El logo del negocio debe estar en `public/logo.png` (incluido a partir del asset del proyecto).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notas
+
+- Las operaciones de negocio usan **Server Actions** (sin API REST en este MVP).
+- La integración real con **ARCA/AFIP** está encapsulada en `lib/arca.ts` como stub; la UI ya permite simular el flujo y guardar el número de comprobante en la venta.

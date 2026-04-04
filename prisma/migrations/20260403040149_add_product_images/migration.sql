@@ -1,0 +1,9 @@
+-- CreateTable
+CREATE TABLE "ImagenProducto" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "productoId" INTEGER NOT NULL,
+    "url" TEXT NOT NULL,
+    "orden" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "ImagenProducto_productoId_fkey" FOREIGN KEY ("productoId") REFERENCES "Producto" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);

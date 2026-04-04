@@ -1,0 +1,242 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+}
+
+model Categoria {
+  id        Int       @id @default(autoincrement())
+  nombre    String    @unique
+  productos Producto[]
+  createdAt DateTime  @default(now())
+}
+
+model Producto {
+  id               Int                 @id @default(autoincrement())
+  nombre           String
+  descripcion      String?
+  codigo           String?             @unique
+  categoriaId      Int
+  categoria        Categoria           @relation(fields: [categoriaId], references: [id])
+  stockActual      Int                 @default(0)
+  stockMinimo      Int                 @default(2)
+  precioCompra     Float
+  precioPublico    Float
+  precioRevendedor Float
+  marca            String?
+  compatibilidad   String?
+  proveedorId      Int?
+  proveedor        Proveedor?          @relation(fields: [proveedorId], references: [id])
+  activo           Boolean             @default(true)
+  itemsVenta       ItemVenta[]
+  itemsOrden       ItemOrdenTrabajo[]
+  movimientosStock MovimientoStock[]
+  itemsEncargo     ItemEncargo[]
+  itemsCompra      ItemCompra[]
+  imagenes         ImagenProducto[]
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+}
+
+model ImagenProducto {
+  id         Int      @id @default(autoincrement())
+  productoId Int
+  producto   Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
+  url        String
+  orden      Int      @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model MovimientoStock {
+  id         Int      @id @default(autoincrement())
+  productoId Int
+  producto   Producto @relation(fields: [productoId], references: [id])
+  tipo       String
+  cantidad   Int
+  motivo     String
+  referencia String?
+  createdAt  DateTime @default(now())
+}
+
+model Cliente {
+  id                  Int                  @id @default(autoincrement())
+  nombre              String
+  apellido            String
+  telefono            String?
+  email               String?
+  dni                 String?            @unique
+  tipoCliente         String             @default("MINORISTA")
+  direccion           String?
+  notas               String?
+  saldoPendiente      Float              @default(0)
+  ventas              Venta[]
+  ordenesTrabajo      OrdenTrabajo[]
+  movimientosCuenta   MovimientoCuenta[]
+  encargos            Encargo[]
+  createdAt           DateTime           @default(now())
+}
+
+model Venta {
+  id           Int         @id @default(autoincrement())
+  numero       Int         @unique
+  clienteId    Int?
+  cliente      Cliente?    @relation(fields: [clienteId], references: [id])
+  items        ItemVenta[]
+  subtotal     Float
+  descuento    Float       @default(0)
+  total        Float
+  medioPago    String
+  estadoPago   String      @default("PAGADO")
+  montoPagado  Float       @default(0)
+  tipoPrecio   String      @default("PUBLICO")
+  notas        String?
+  facturaARCA  String?
+  createdAt    DateTime    @default(now())
+}
+
+model ItemVenta {
+  id         Int      @id @default(autoincrement())
+  ventaId    Int
+  venta      Venta    @relation(fields: [ventaId], references: [id], onDelete: Cascade)
+  productoId Int
+  producto   Producto @relation(fields: [productoId], references: [id])
+  cantidad   Int
+  precioUnit Float
+  subtotal   Float
+}
+
+model OrdenTrabajo {
+  id               Int                  @id @default(autoincrement())
+  numero           Int                  @unique
+  clienteId        Int?
+  cliente          Cliente?             @relation(fields: [clienteId], references: [id])
+  motoMarca        String?
+  motoModelo       String?
+  motoPatente      String?
+  motoAnio         Int?
+  kilometraje      Int?
+  descripcionFalla String
+  trabajoRealizado String?
+  estado           String               @default("RECIBIDA")
+  items            ItemOrdenTrabajo[]
+  costoManoObra    Float                @default(0)
+  costoRepuestos   Float                @default(0)
+  total            Float                @default(0)
+  medioPago        String?
+  estadoPago       String               @default("PENDIENTE")
+  notas            String?
+  fechaIngreso     DateTime             @default(now())
+  fechaEstimada    DateTime?
+  fechaEntrega     DateTime?
+  historialEstados OrdenEstadoHistorial[]
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+}
+
+model OrdenEstadoHistorial {
+  id        Int          @id @default(autoincrement())
+  ordenId   Int
+  orden     OrdenTrabajo @relation(fields: [ordenId], references: [id], onDelete: Cascade)
+  estado    String
+  createdAt DateTime     @default(now())
+}
+
+model ItemOrdenTrabajo {
+  id         Int          @id @default(autoincrement())
+  ordenId    Int
+  orden      OrdenTrabajo @relation(fields: [ordenId], references: [id], onDelete: Cascade)
+  productoId Int
+  producto   Producto     @relation(fields: [productoId], references: [id])
+  cantidad   Int
+  precioUnit Float
+  subtotal   Float
+}
+
+model Proveedor {
+  id        Int        @id @default(autoincrement())
+  nombre    String
+  contacto  String?
+  telefono  String?
+  email     String?
+  notas     String?
+  productos Producto[]
+  compras   Compra[]
+  createdAt DateTime   @default(now())
+}
+
+model Compra {
+  id          Int          @id @default(autoincrement())
+  proveedorId Int
+  proveedor   Proveedor    @relation(fields: [proveedorId], references: [id])
+  items       ItemCompra[]
+  total       Float
+  estado      String       @default("RECIBIDA")
+  notas       String?
+  createdAt   DateTime     @default(now())
+}
+
+model ItemCompra {
+  id          Int      @id @default(autoincrement())
+  compraId    Int
+  compra      Compra   @relation(fields: [compraId], references: [id], onDelete: Cascade)
+  productoId  Int
+  producto    Producto @relation(fields: [productoId], references: [id])
+  cantidad    Int
+  precioUnit  Float
+  subtotal    Float
+}
+
+model Encargo {
+  id        Int           @id @default(autoincrement())
+  clienteId Int
+  cliente   Cliente       @relation(fields: [clienteId], references: [id])
+  items     ItemEncargo[]
+  estado    String        @default("PENDIENTE")
+  notas     String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model ItemEncargo {
+  id          Int      @id @default(autoincrement())
+  encargoId   Int
+  encargo     Encargo  @relation(fields: [encargoId], references: [id], onDelete: Cascade)
+  productoId  Int?
+  producto    Producto? @relation(fields: [productoId], references: [id])
+  descripcion String
+  cantidad    Int
+}
+
+model MovimientoCuenta {
+  id          Int      @id @default(autoincrement())
+  clienteId   Int
+  cliente     Cliente  @relation(fields: [clienteId], references: [id])
+  tipo        String
+  monto       Float
+  descripcion String
+  referencia  String?
+  createdAt   DateTime @default(now())
+}
+
+model ConfiguracionNegocio {
+  id            Int     @id @default(1)
+  nombreNegocio String  @default("Laureano Racing")
+  cuit          String?
+  direccion     String?
+  telefono      String?
+  email         String?
+  condicionIVA  String?
+  ptoVentaARCA  Int?
+  logoUrl       String?
+}
