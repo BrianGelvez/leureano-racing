@@ -25,7 +25,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
+# local env files (nunca subir secretos a GitHub)
+.env
 .env*.local
 
 # vercel
@@ -34,4 +35,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
+# sqlite local (se genera con `npm run db:setup`)
+/prisma/dev.db
+/prisma/dev.db-journal
 
+# imágenes de productos subidas en cada máquina
+/public/uploads/productos/*
+!/public/uploads/productos/.gitkeep
