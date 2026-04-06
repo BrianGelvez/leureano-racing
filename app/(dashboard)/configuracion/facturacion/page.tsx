@@ -1,28 +1,43 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { FileText, Sparkles } from "lucide-react";
 import { ConfigForm } from "@/components/config/config-form";
+import {
+  DashboardBreadcrumb,
+  DashboardHero,
+  DashboardHeroBadge,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default async function FacturacionConfigPage() {
   const cfg = await prisma.configuracionNegocio.findUnique({ where: { id: 1 } });
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/configuracion">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div>
-          <h2 className="text-2xl font-bold text-white">Facturación ARCA</h2>
-          <p className="text-white/55">
-            Preparado para certificado .p12 y WS — ver <code className="text-white/70">lib/arca.ts</code>
-          </p>
-        </div>
-      </div>
+    <DashboardPage narrow>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { href: "/configuracion", label: "Configuración" },
+          { label: "Facturación ARCA" },
+        ]}
+      />
+      <DashboardHero
+        backHref="/configuracion"
+        backLabel="Volver a configuración"
+        badge={
+          <DashboardHeroBadge icon={<Sparkles className="h-3 w-3" aria-hidden />}>
+            ARCA
+          </DashboardHeroBadge>
+        }
+        title="Facturación ARCA"
+        description={
+          <>
+            Preparado para certificado .p12 y web services. Referencia técnica en{" "}
+            <code className="text-white/70">lib/arca.ts</code>.
+          </>
+        }
+        icon={<FileText className="h-7 w-7 text-[#E01010]" />}
+      />
 
       <Card className="border-white/10">
         <CardHeader>
@@ -50,6 +65,6 @@ export default async function FacturacionConfigPage() {
           ptoVentaARCA: cfg?.ptoVentaARCA ?? null,
         }}
       />
-    </div>
+    </DashboardPage>
   );
 }

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatARS } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -16,7 +15,12 @@ import { ClienteForm } from "@/components/clientes/cliente-form";
 import { ClientePagoModal } from "@/components/clientes/cliente-pago-modal";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { ArrowLeft } from "lucide-react";
+import { Users } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardHero,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default async function ClienteDetallePage({
   params,
@@ -41,30 +45,33 @@ export default async function ClienteDetallePage({
   if (!cliente) notFound();
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/clientes">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold text-white">
-            {cliente.nombre} {cliente.apellido}
-          </h2>
-          <p className="text-white/55">
+    <DashboardPage narrow>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { href: "/clientes", label: "Clientes" },
+          { label: `${cliente.nombre} ${cliente.apellido}` },
+        ]}
+      />
+      <DashboardHero
+        backHref="/clientes"
+        backLabel="Volver a clientes"
+        title={`${cliente.nombre} ${cliente.apellido}`}
+        description={
+          <>
             Saldo cuenta corriente:{" "}
             <span
               className={
-                cliente.saldoPendiente > 0 ? "text-amber-400" : "text-white/70"
+                cliente.saldoPendiente > 0 ? "text-amber-400" : "text-white/80"
               }
             >
               {formatARS(cliente.saldoPendiente)}
             </span>
-          </p>
-        </div>
-        <ClientePagoModal clienteId={cliente.id} />
-      </div>
+          </>
+        }
+        icon={<Users className="h-7 w-7 text-[#E01010]" />}
+        actions={<ClientePagoModal clienteId={cliente.id} />}
+      />
 
       <ClienteForm
         clienteId={cliente.id}
@@ -159,6 +166,6 @@ export default async function ClienteDetallePage({
               ))}
         </CardContent>
       </Card>
-    </div>
+    </DashboardPage>
   );
 }

@@ -1,12 +1,16 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ProductoForm } from "@/components/productos/producto-form";
 import { ImagenUploader } from "@/components/productos/ImagenUploader";
 import { ProductoEliminar } from "@/components/productos/producto-eliminar";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { Package, Sparkles } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardHero,
+  DashboardHeroBadge,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default async function EditarProductoPage({
   params,
@@ -30,19 +34,28 @@ export default async function EditarProductoPage({
   if (!producto) notFound();
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href={`/productos/${id}`}>
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold text-white">Editar producto</h2>
-          <p className="text-white/55">{producto.nombre}</p>
-        </div>
-        <ProductoEliminar productoId={id} nombre={producto.nombre} />
-      </div>
+    <DashboardPage narrow>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { href: "/productos", label: "Productos" },
+          { href: `/productos/${id}`, label: producto.nombre },
+          { label: "Editar" },
+        ]}
+      />
+      <DashboardHero
+        backHref={`/productos/${id}`}
+        backLabel="Volver a la ficha del producto"
+        badge={
+          <DashboardHeroBadge icon={<Sparkles className="h-3 w-3" aria-hidden />}>
+            Edición
+          </DashboardHeroBadge>
+        }
+        title="Editar producto"
+        description={producto.nombre}
+        icon={<Package className="h-7 w-7 text-[#E01010]" />}
+        actions={<ProductoEliminar productoId={id} nombre={producto.nombre} />}
+      />
 
       <ProductoForm
         categorias={categorias}
@@ -78,6 +91,6 @@ export default async function EditarProductoPage({
           </Card>
         }
       />
-    </div>
+    </DashboardPage>
   );
 }

@@ -12,6 +12,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Wallet } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardHero,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default async function CajaPage() {
   const now = new Date();
@@ -43,11 +49,18 @@ export default async function CajaPage() {
   });
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold text-white">Caja y finanzas</h2>
-        <p className="text-white/55">Resumen del día y cuentas corrientes</p>
-      </div>
+    <DashboardPage>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { label: "Caja" },
+        ]}
+      />
+      <DashboardHero
+        title="Caja y finanzas"
+        description="Ventas del día por medio de pago, deudores y movimientos recientes de cuenta corriente."
+        icon={<Wallet className="h-7 w-7 text-[#E01010]" />}
+      />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="border-white/10">
@@ -116,7 +129,7 @@ export default async function CajaPage() {
             <TableBody>
               {movs.map((m) => (
                 <TableRow key={m.id}>
-                  <TableCell className="text-white/60 text-sm">
+                  <TableCell className="text-sm text-white/60">
                     {m.createdAt.toLocaleString("es-AR")}
                   </TableCell>
                   <TableCell>
@@ -131,6 +144,6 @@ export default async function CajaPage() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </DashboardPage>
   );
 }

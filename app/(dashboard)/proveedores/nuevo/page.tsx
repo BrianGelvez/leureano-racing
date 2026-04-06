@@ -1,20 +1,35 @@
-import Link from "next/link";
 import { ProveedorForm } from "@/components/proveedores/proveedor-form";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { Truck, Sparkles } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardHero,
+  DashboardHeroBadge,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default function NuevoProveedorPage() {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/proveedores">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <h2 className="text-2xl font-bold text-white">Nuevo proveedor</h2>
-      </div>
+    <DashboardPage narrow>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { href: "/proveedores", label: "Proveedores" },
+          { label: "Nuevo" },
+        ]}
+      />
+      <DashboardHero
+        backHref="/proveedores"
+        backLabel="Volver a proveedores"
+        badge={
+          <DashboardHeroBadge icon={<Sparkles className="h-3 w-3" aria-hidden />}>
+            Alta
+          </DashboardHeroBadge>
+        }
+        title="Nuevo proveedor"
+        description="Datos de contacto y notas. Luego podés asociar productos y registrar compras."
+        icon={<Truck className="h-7 w-7 text-[#E01010]" />}
+      />
       <ProveedorForm />
-    </div>
+    </DashboardPage>
   );
 }

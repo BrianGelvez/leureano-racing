@@ -11,6 +11,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { ProveedorCompraDialog } from "@/components/proveedores/proveedor-compra-dialog";
 import { Truck } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardEmptyState,
+  DashboardHero,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default async function ProveedoresPage() {
   const proveedores = await prisma.proveedor.findMany({
@@ -24,22 +30,35 @@ export default async function ProveedoresPage() {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-white">Proveedores</h2>
-          <p className="text-white/55">Compras y contacto</p>
-        </div>
-        <Button asChild>
-          <Link href="/proveedores/nuevo">Nuevo proveedor</Link>
-        </Button>
-      </div>
+    <DashboardPage>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { label: "Proveedores" },
+        ]}
+      />
+      <DashboardHero
+        title="Proveedores"
+        description="Contacto, compras rápidas y productos vinculados. Registrá compras desde la tabla."
+        icon={<Truck className="h-7 w-7 text-[#E01010]" />}
+        actions={
+          <Button asChild>
+            <Link href="/proveedores/nuevo">Nuevo proveedor</Link>
+          </Button>
+        }
+      />
 
       {proveedores.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/15 py-16">
-          <Truck className="mb-3 h-12 w-12 text-white/25" />
-          <p className="text-white/55">Sin proveedores.</p>
-        </div>
+        <DashboardEmptyState
+          icon={<Truck className="h-12 w-12" />}
+          title="Sin proveedores cargados"
+          description="Agregá proveedores para asociarlos a productos y registrar compras."
+          action={
+            <Button asChild>
+              <Link href="/proveedores/nuevo">Nuevo proveedor</Link>
+            </Button>
+          }
+        />
       ) : (
         <div className="glass-panel overflow-hidden rounded-2xl">
           <Table>
@@ -73,6 +92,6 @@ export default async function ProveedoresPage() {
           </Table>
         </div>
       )}
-    </div>
+    </DashboardPage>
   );
 }

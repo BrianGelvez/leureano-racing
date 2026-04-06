@@ -1,6 +1,14 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { imagenPrincipalUrl } from "@/lib/product-images";
 import { ProductosTable } from "@/components/productos/productos-table";
+import { Button } from "@/components/ui/button";
+import { Package } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardHero,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default async function ProductosPage({
   searchParams,
@@ -33,16 +41,28 @@ export default async function ProductosPage({
   }));
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-white">Productos</h2>
-        <p className="text-white/55">Stock, precios y categorías</p>
-      </div>
+    <DashboardPage>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { label: "Productos" },
+        ]}
+      />
+      <DashboardHero
+        title="Productos"
+        description="Stock, precios por canal, categorías e imágenes. Filtrá por stock bajo desde la tabla."
+        icon={<Package className="h-7 w-7 text-[#E01010]" />}
+        actions={
+          <Button asChild>
+            <Link href="/productos/nuevo">Nuevo producto</Link>
+          </Button>
+        }
+      />
       <ProductosTable
         data={rows}
         categorias={categorias}
         initialStockFilter={searchParams.stock}
       />
-    </div>
+    </DashboardPage>
   );
 }

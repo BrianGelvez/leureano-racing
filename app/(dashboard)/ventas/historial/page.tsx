@@ -2,6 +2,12 @@ import { prisma } from "@/lib/prisma";
 import { VentasHistorialTable } from "@/components/ventas/ventas-historial-table";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ShoppingCart } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardHero,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default async function VentasHistorialPage() {
   const ventas = await prisma.venta.findMany({
@@ -11,17 +17,24 @@ export default async function VentasHistorialPage() {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-white">Historial de ventas</h2>
-          <p className="text-white/55">Últimas 100 operaciones</p>
-        </div>
-        <Button asChild>
-          <Link href="/ventas/nueva">Nueva venta</Link>
-        </Button>
-      </div>
+    <DashboardPage>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { label: "Historial de ventas" },
+        ]}
+      />
+      <DashboardHero
+        title="Historial de ventas"
+        description="Últimas 100 operaciones con cliente, totales y detalle para consulta rápida."
+        icon={<ShoppingCart className="h-7 w-7 text-[#E01010]" />}
+        actions={
+          <Button asChild>
+            <Link href="/ventas/nueva">Nueva venta</Link>
+          </Button>
+        }
+      />
       <VentasHistorialTable ventas={ventas} />
-    </div>
+    </DashboardPage>
   );
 }

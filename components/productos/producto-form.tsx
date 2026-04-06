@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,10 +18,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { crearProducto, actualizarProducto } from "@/app/actions/productos";
 import { toast } from "sonner";
 import { useState } from "react";
+import { ImageIcon } from "lucide-react";
 
 type Form = z.infer<typeof productoSchema>;
 
@@ -31,6 +39,8 @@ export function ProductoForm({
   productoId,
   extraBeforeSubmit,
   redirectAfterUpdate = "/productos",
+  postCreateStayOnPage,
+  renderImagenes,
 }: {
   categorias: { id: number; nombre: string }[];
   proveedores: { id: number; nombre: string }[];
@@ -40,10 +50,17 @@ export function ProductoForm({
   extraBeforeSubmit?: ReactNode;
   /** Tras actualizar un producto existente */
   redirectAfterUpdate?: string;
+  /** En alta: tras crear no redirige; habilita imágenes en la misma vista */
+  postCreateStayOnPage?: boolean;
+  /** Galería cuando ya hay `productoId` o un producto recién creado en esta vista */
+  renderImagenes?: (id: number) => ReactNode;
 }) {
   const router = useRouter();
   const [pctPub, setPctPub] = useState("40");
   const [pctRev, setPctRev] = useState("30");
+  const [createdProductId, setCreatedProductId] = useState<number | null>(null);
+
+  const effectiveProductoId = productoId ?? createdProductId ?? undefined;
 
   const form = useForm<Form>({
     resolver: zodResolver(productoSchema),
@@ -70,8 +87,8 @@ export function ProductoForm({
       : 0;
 
   async function onSubmit(data: Form) {
-    const res = productoId
-      ? await actualizarProducto(productoId, data)
+    const res = effectiveProductoId
+      ? await actualizarProducto(effectiveProductoId, data)
       : await crearProducto(data);
     if (!res.ok) {
       if ("error" in res && res.error) {
@@ -79,22 +96,41 @@ export function ProductoForm({
       } else toast.error("No se pudo guardar");
       return;
     }
-    toast.success(productoId ? "Producto actualizado" : "Producto creado");
-    if (productoId) {
-      router.push(redirectAfterUpdate);
-    } else if ("id" in res && typeof res.id === "number") {
-      router.push(`/productos/${res.id}/editar`);
-    } else {
-      router.push("/productos");
+    if (effectiveProductoId) {
+      toast.success(productoId ? "Producto actualizado" : "Cambios guardados");
+      if (productoId) {
+        router.push(redirectAfterUpdate);
+      }
+      router.refresh();
+      return;
     }
+    if ("id" in res && typeof res.id === "number") {
+      toast.success("Producto creado");
+      if (postCreateStayOnPage) {
+        setCreatedProductId(res.id);
+        router.refresh();
+        return;
+      }
+      router.push(`/productos/${res.id}/editar`);
+      router.refresh();
+      return;
+    }
+    router.push("/productos");
     router.refresh();
   }
+
+  const submitLabel = !effectiveProductoId
+    ? "Crear producto"
+    : "Guardar cambios";
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl space-y-6">
       <Card className="border-white/10">
         <CardHeader>
           <CardTitle>Datos generales</CardTitle>
+          <CardDescription>
+            Nombre, categoría y datos que verás en fichas y ventas.
+          </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2 space-y-2">
@@ -170,6 +206,9 @@ export function ProductoForm({
       <Card className="border-white/10">
         <CardHeader>
           <CardTitle>Stock y precios</CardTitle>
+          <CardDescription>
+            Usá los botones % para calcular precios desde el costo.
+          </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
@@ -243,11 +282,74 @@ export function ProductoForm({
         </CardContent>
       </Card>
 
+      {postCreateStayOnPage && createdProductId && (
+        <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/[0.08] px-4 py-3 text-sm text-emerald-100/90">
+          El producto ya está en el sistema. Podés subir fotos abajo y seguir
+          ajustando datos; tocá &quot;Guardar cambios&quot; cuando termines.
+        </div>
+      )}
+
+      {renderImagenes &&
+        (effectiveProductoId ? (
+          <Card className="border-white/10 shadow-[0_0_0_1px_rgba(224,16,16,0.12)]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ImageIcon className="h-5 w-5 text-[#E01010]" aria-hidden />
+                Imágenes del producto
+              </CardTitle>
+              <CardDescription>
+                La primera imagen es la portada en listados y búsquedas.
+                Arrastrá para reordenar.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>{renderImagenes(effectiveProductoId)}</CardContent>
+          </Card>
+        ) : (
+          <Card className="border-dashed border-white/15 bg-white/[0.02]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-white/90">
+                <ImageIcon className="h-5 w-5 text-white/40" aria-hidden />
+                Imágenes
+              </CardTitle>
+              <CardDescription>
+                Paso 2: después de crear el producto vas a poder subir JPG, PNG
+                o WebP (máx. 5 MB cada una).
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div
+                className="flex min-h-[120px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-white/10 bg-black/20 px-4 py-8 text-center text-sm text-white/45"
+                aria-hidden
+              >
+                <span className="rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-white/50">
+                  Pendiente de crear
+                </span>
+                Completá los datos y tocá &quot;Crear producto&quot;.
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+
       {extraBeforeSubmit}
 
-      <Button type="submit" size="lg">
-        Guardar producto
-      </Button>
+      <div className="flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <Button type="submit" size="lg" className="w-full sm:w-auto">
+          {submitLabel}
+        </Button>
+        {postCreateStayOnPage && createdProductId != null && (
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+            <Button variant="secondary" asChild className="w-full sm:w-auto">
+              <Link href={`/productos/${createdProductId}`}>Ver ficha</Link>
+            </Button>
+            <Button variant="outline" asChild className="w-full sm:w-auto">
+              <Link href="/productos">Ir al listado</Link>
+            </Button>
+            <Button variant="ghost" asChild className="w-full sm:w-auto">
+              <Link href="/productos/nuevo">Crear otro producto</Link>
+            </Button>
+          </div>
+        )}
+      </div>
     </form>
   );
 }

@@ -1,9 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { imagenPrincipalUrl } from "@/lib/product-images";
 import { NuevaVentaForm } from "@/components/ventas/nueva-venta-form";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ShoppingCart, Sparkles } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardHero,
+  DashboardHeroBadge,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default async function NuevaVentaPage() {
   const [clientes, productosRaw] = await Promise.all([
@@ -24,19 +28,27 @@ export default async function NuevaVentaPage() {
   }));
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/ventas/historial">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div>
-          <h2 className="text-2xl font-bold text-white">Nueva venta</h2>
-          <p className="text-white/55">Mostrador — venta rápida</p>
-        </div>
-      </div>
+    <DashboardPage>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { href: "/ventas/historial", label: "Ventas" },
+          { label: "Nueva venta" },
+        ]}
+      />
+      <DashboardHero
+        backHref="/ventas/historial"
+        backLabel="Volver al historial de ventas"
+        badge={
+          <DashboardHeroBadge icon={<Sparkles className="h-3 w-3" aria-hidden />}>
+            Mostrador
+          </DashboardHeroBadge>
+        }
+        title="Nueva venta"
+        description="Buscá productos, elegí lista público o revendedor, medios de pago y descuentos en un solo flujo."
+        icon={<ShoppingCart className="h-7 w-7 text-[#E01010]" />}
+      />
       <NuevaVentaForm clientes={clientes} productos={productos} />
-    </div>
+    </DashboardPage>
   );
 }

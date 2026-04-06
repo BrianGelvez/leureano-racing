@@ -12,6 +12,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Users } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardEmptyState,
+  DashboardHero,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default async function ClientesPage() {
   const clientes = await prisma.cliente.findMany({
@@ -22,22 +28,35 @@ export default async function ClientesPage() {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-white">Clientes</h2>
-          <p className="text-white/55">Cuentas y contacto</p>
-        </div>
-        <Button asChild>
-          <Link href="/clientes/nuevo">Nuevo cliente</Link>
-        </Button>
-      </div>
+    <DashboardPage>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { label: "Clientes" },
+        ]}
+      />
+      <DashboardHero
+        title="Clientes"
+        description="Cuentas corrientes, tipo minorista o mayorista, y contacto rápido para ventas y taller."
+        icon={<Users className="h-7 w-7 text-[#E01010]" />}
+        actions={
+          <Button asChild>
+            <Link href="/clientes/nuevo">Nuevo cliente</Link>
+          </Button>
+        }
+      />
 
       {clientes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/15 py-16">
-          <Users className="mb-3 h-12 w-12 text-white/25" />
-          <p className="text-white/55">No hay clientes cargados.</p>
-        </div>
+        <DashboardEmptyState
+          icon={<Users className="h-12 w-12" />}
+          title="Todavía no hay clientes"
+          description="Creá el primero para asociarlo a ventas, taller y encargos."
+          action={
+            <Button asChild>
+              <Link href="/clientes/nuevo">Nuevo cliente</Link>
+            </Button>
+          }
+        />
       ) : (
         <div className="glass-panel overflow-hidden rounded-2xl">
           <Table>
@@ -74,7 +93,7 @@ export default async function ClientesPage() {
                   >
                     {formatARS(c.saldoPendiente)}
                   </TableCell>
-                  <TableCell className="text-white/50 text-sm">
+                  <TableCell className="text-sm text-white/50">
                     {c.ventas[0]
                       ? new Date(c.ventas[0].createdAt).toLocaleDateString("es-AR")
                       : "—"}
@@ -90,6 +109,6 @@ export default async function ClientesPage() {
           </Table>
         </div>
       )}
-    </div>
+    </DashboardPage>
   );
 }

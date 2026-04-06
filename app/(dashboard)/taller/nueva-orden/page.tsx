@@ -1,9 +1,13 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { imagenPrincipalUrl } from "@/lib/product-images";
 import { NuevaOrdenForm } from "@/components/taller/nueva-orden-form";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { Wrench, Sparkles } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardHero,
+  DashboardHeroBadge,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default async function NuevaOrdenPage() {
   const [clientes, productosRaw] = await Promise.all([
@@ -21,19 +25,27 @@ export default async function NuevaOrdenPage() {
   }));
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/taller/ordenes">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div>
-          <h2 className="text-2xl font-bold text-white">Nueva orden de trabajo</h2>
-          <p className="text-white/55">Ingreso al taller</p>
-        </div>
-      </div>
+    <DashboardPage>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { href: "/taller/ordenes", label: "Taller" },
+          { label: "Nueva orden" },
+        ]}
+      />
+      <DashboardHero
+        backHref="/taller/ordenes"
+        backLabel="Volver a órdenes de taller"
+        badge={
+          <DashboardHeroBadge icon={<Sparkles className="h-3 w-3" aria-hidden />}>
+            Ingreso
+          </DashboardHeroBadge>
+        }
+        title="Nueva orden de trabajo"
+        description="Cliente, moto, falla declarada y repuestos con stock en vivo."
+        icon={<Wrench className="h-7 w-7 text-[#E01010]" />}
+      />
       <NuevaOrdenForm clientes={clientes} productos={productos} />
-    </div>
+    </DashboardPage>
   );
 }

@@ -2,7 +2,14 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { EncargoNuevoForm } from "@/components/encargos/encargo-nuevo-form";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ClipboardList, Sparkles } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardCallout,
+  DashboardHero,
+  DashboardHeroBadge,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default async function EncargoNuevoPage({
   searchParams,
@@ -19,17 +26,37 @@ export default async function EncargoNuevoPage({
     : undefined;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/encargos">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <h2 className="text-2xl font-bold text-white">Nuevo encargo</h2>
-      </div>
+    <DashboardPage narrow>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { href: "/encargos", label: "Encargos" },
+          { label: "Nuevo" },
+        ]}
+      />
+      <DashboardHero
+        backHref="/encargos"
+        backLabel="Volver a encargos"
+        badge={
+          <DashboardHeroBadge icon={<Sparkles className="h-3 w-3" aria-hidden />}>
+            Alta
+          </DashboardHeroBadge>
+        }
+        title="Nuevo encargo"
+        description="Asociá cliente e ítems. Si venís desde stock bajo, el producto puede venir preseleccionado."
+        icon={<ClipboardList className="h-7 w-7 text-[#E01010]" />}
+      />
+
       {clientes.length === 0 ? (
-        <p className="text-amber-400">Necesitás al menos un cliente.</p>
+        <DashboardCallout
+          title="Necesitás al menos un cliente para crear un encargo."
+          description="Creá un cliente desde la sección Clientes y volvé acá."
+          action={
+            <Button asChild>
+              <Link href="/clientes/nuevo">Nuevo cliente</Link>
+            </Button>
+          }
+        />
       ) : (
         <EncargoNuevoForm
           clientes={clientes}
@@ -41,6 +68,6 @@ export default async function EncargoNuevoPage({
           }
         />
       )}
-    </div>
+    </DashboardPage>
   );
 }

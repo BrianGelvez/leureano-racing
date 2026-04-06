@@ -17,8 +17,12 @@ import {
   eachDayOfInterval,
 } from "date-fns";
 import { es } from "date-fns/locale";
-import { Package, ShoppingCart, Wrench, Users, Bell, AlertTriangle } from "lucide-react";
+import { Package, ShoppingCart, Wrench, Users, Bell, AlertTriangle, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DashboardHero,
+  DashboardPage as DashboardPageShell,
+} from "@/components/layout/dashboard-page-shell";
 
 type ProductoStockDashboard = Prisma.ProductoGetPayload<{
   include: { categoria: true };
@@ -26,7 +30,7 @@ type ProductoStockDashboard = Prisma.ProductoGetPayload<{
   imagenes: { url: string; orden: number }[];
 };
 
-export default async function DashboardPage() {
+export default async function DashboardHomePage() {
   const now = new Date();
   const dayStart = startOfDay(now);
   const dayEnd = endOfDay(now);
@@ -140,15 +144,12 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">
-          Panel principal
-        </h2>
-        <p className="mt-1 text-white/55">
-          Resumen del negocio en tiempo real
-        </p>
-      </div>
+    <DashboardPageShell>
+      <DashboardHero
+        title="Panel principal"
+        description="Resumen del negocio en tiempo real: ventas, taller, stock y cuentas."
+        icon={<LayoutDashboard className="h-7 w-7 text-[#E01010]" />}
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {kpis.map((k) => {
@@ -305,6 +306,6 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </DashboardPageShell>
   );
 }

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatARS } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -14,7 +13,12 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { ArrowLeft } from "lucide-react";
+import { Truck } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardHero,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default async function ProveedorDetallePage({
   params,
@@ -34,20 +38,25 @@ export default async function ProveedorDetallePage({
   if (!p) notFound();
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/proveedores">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div>
-          <h2 className="text-2xl font-bold text-white">{p.nombre}</h2>
-          <p className="text-white/55">
-            {p.telefono} · {p.email}
-          </p>
-        </div>
-      </div>
+    <DashboardPage narrow>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { href: "/proveedores", label: "Proveedores" },
+          { label: p.nombre },
+        ]}
+      />
+      <DashboardHero
+        backHref="/proveedores"
+        backLabel="Volver a proveedores"
+        title={p.nombre}
+        description={
+          <>
+            {p.telefono ?? "Sin teléfono"} · {p.email ?? "Sin email"}
+          </>
+        }
+        icon={<Truck className="h-7 w-7 text-[#E01010]" />}
+      />
 
       <Card className="border-white/10">
         <CardHeader>
@@ -58,7 +67,7 @@ export default async function ProveedorDetallePage({
             <Link
               key={pr.id}
               href={`/productos/${pr.id}`}
-              className="rounded-full border border-white/10 px-3 py-1 text-sm hover:border-[#E01010]/40"
+              className="rounded-full border border-white/10 px-3 py-1 text-sm transition-colors hover:border-[#E01010]/40"
             >
               {pr.nombre}
             </Link>
@@ -93,6 +102,6 @@ export default async function ProveedorDetallePage({
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </DashboardPage>
   );
 }

@@ -3,6 +3,12 @@ import { imagenPrincipalUrl } from "@/lib/product-images";
 import { formatARS } from "@/lib/utils";
 import { ProductoThumbnail } from "@/components/productos/producto-thumbnail";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FileText } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardHero,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 import {
   Table,
   TableBody,
@@ -67,11 +73,18 @@ export default async function ReportesPage() {
   }));
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold text-white">Reportes</h2>
-        <p className="text-white/55">Últimos 30 días (MVP)</p>
-      </div>
+    <DashboardPage>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { label: "Reportes" },
+        ]}
+      />
+      <DashboardHero
+        title="Reportes"
+        description="Últimos 30 días: ventas, top productos, taller y márgenes orientativos (MVP)."
+        icon={<FileText className="h-7 w-7 text-[#E01010]" />}
+      />
 
       <ReportesCharts
         ventas={ventas}
@@ -180,6 +193,6 @@ export default async function ReportesPage() {
             ))}
         </CardContent>
       </Card>
-    </div>
+    </DashboardPage>
   );
 }

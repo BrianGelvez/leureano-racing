@@ -207,9 +207,6 @@ export function ProductosTable({
               <SelectItem value="agotado">Agotado</SelectItem>
             </SelectContent>
           </Select>
-          <Button asChild>
-            <Link href="/productos/nuevo">Nuevo producto</Link>
-          </Button>
         </div>
       </div>
 

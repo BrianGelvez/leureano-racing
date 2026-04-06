@@ -1,7 +1,5 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -12,7 +10,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatARS } from "@/lib/utils";
-import { ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { OrdenEstadoActions } from "@/components/taller/orden-estado-actions";
@@ -20,6 +17,12 @@ import { OrdenPdfButton } from "@/components/taller/orden-pdf-button";
 import { Badge } from "@/components/ui/badge";
 import { imagenPrincipalUrl } from "@/lib/product-images";
 import { ProductoThumbnail } from "@/components/productos/producto-thumbnail";
+import { Wrench } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardHero,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default async function OrdenDetallePage({
   params,
@@ -44,27 +47,32 @@ export default async function OrdenDetallePage({
   if (!orden) notFound();
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/taller/ordenes">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold text-white">
-            OT-{orden.numero}
-            <Badge className="ml-3" variant="secondary">
+    <DashboardPage>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { href: "/taller/ordenes", label: "Taller" },
+          { label: `OT-${orden.numero}` },
+        ]}
+      />
+      <DashboardHero
+        backHref="/taller/ordenes"
+        backLabel="Volver al tablero de taller"
+        title={`OT-${orden.numero}`}
+        description={
+          <span className="inline-flex flex-wrap items-center gap-2">
+            <Badge variant="secondary">
               {orden.estado.replace(/_/g, " ")}
             </Badge>
-          </h2>
-          <p className="text-white/55">
-            Ingreso{" "}
-            {format(orden.fechaIngreso, "dd/MM/yyyy HH:mm", { locale: es })}
-          </p>
-        </div>
-        <OrdenPdfButton ordenId={orden.id} numero={orden.numero} />
-      </div>
+            <span>
+              Ingreso{" "}
+              {format(orden.fechaIngreso, "dd/MM/yyyy HH:mm", { locale: es })}
+            </span>
+          </span>
+        }
+        icon={<Wrench className="h-7 w-7 text-[#E01010]" />}
+        actions={<OrdenPdfButton ordenId={orden.id} numero={orden.numero} />}
+      />
 
       <OrdenEstadoActions ordenId={orden.id} estadoActual={orden.estado} />
 
@@ -171,6 +179,6 @@ export default async function OrdenDetallePage({
           ))}
         </CardContent>
       </Card>
-    </div>
+    </DashboardPage>
   );
 }

@@ -15,7 +15,12 @@ import { ProductoAjusteStock } from "@/components/productos/producto-ajuste-stoc
 import { ProductoGaleria } from "@/components/productos/producto-galeria";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { ArrowLeft, Pencil } from "lucide-react";
+import { Pencil, Package } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardHero,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default async function ProductoDetallePage({
   params,
@@ -62,33 +67,43 @@ export default async function ProductoDetallePage({
   });
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/productos">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-bold text-white">{producto.nombre}</h2>
-          <p className="text-white/55">
+    <DashboardPage>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { href: "/productos", label: "Productos" },
+          { label: producto.nombre },
+        ]}
+      />
+      <DashboardHero
+        backHref="/productos"
+        backLabel="Volver a productos"
+        title={producto.nombre}
+        description={
+          <>
             {producto.categoria.nombre}
             {producto.codigo ? ` · ${producto.codigo}` : ""}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button asChild>
-            <Link href={`/productos/${producto.id}/editar`}>
-              <Pencil className="mr-2 h-4 w-4" />
-              Editar
-            </Link>
-          </Button>
-          <ProductoAjusteStock
-            productoId={producto.id}
-            stockActual={producto.stockActual}
-          />
-        </div>
-      </div>
+            {producto.proveedor
+              ? ` · Proveedor: ${producto.proveedor.nombre}`
+              : ""}
+          </>
+        }
+        icon={<Package className="h-7 w-7 text-[#E01010]" />}
+        actions={
+          <>
+            <Button asChild>
+              <Link href={`/productos/${producto.id}/editar`}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Editar
+              </Link>
+            </Button>
+            <ProductoAjusteStock
+              productoId={producto.id}
+              stockActual={producto.stockActual}
+            />
+          </>
+        }
+      />
 
       {producto.imagenes.length > 0 && (
         <ProductoGaleria imagenes={producto.imagenes} />
@@ -166,6 +181,6 @@ export default async function ProductoDetallePage({
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </DashboardPage>
   );
 }

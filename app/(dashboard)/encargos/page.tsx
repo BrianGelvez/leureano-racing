@@ -2,6 +2,12 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { EncargosTable } from "@/components/encargos/encargos-table";
 import { Button } from "@/components/ui/button";
+import { ClipboardList } from "lucide-react";
+import {
+  DashboardBreadcrumb,
+  DashboardHero,
+  DashboardPage,
+} from "@/components/layout/dashboard-page-shell";
 
 export default async function EncargosPage({
   searchParams,
@@ -22,17 +28,24 @@ export default async function EncargosPage({
       : encargos;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-white">Encargos</h2>
-          <p className="text-white/55">Pedidos a proveedor y avisos al cliente</p>
-        </div>
-        <Button asChild>
-          <Link href="/encargos/nuevo">Nuevo encargo</Link>
-        </Button>
-      </div>
+    <DashboardPage>
+      <DashboardBreadcrumb
+        items={[
+          { href: "/", label: "Inicio" },
+          { label: "Encargos" },
+        ]}
+      />
+      <DashboardHero
+        title="Encargos"
+        description="Pedidos a proveedor, seguimiento y avisos al cliente cuando llega la mercadería."
+        icon={<ClipboardList className="h-7 w-7 text-[#E01010]" />}
+        actions={
+          <Button asChild>
+            <Link href="/encargos/nuevo">Nuevo encargo</Link>
+          </Button>
+        }
+      />
       <EncargosTable encargos={filtered} />
-    </div>
+    </DashboardPage>
   );
 }
